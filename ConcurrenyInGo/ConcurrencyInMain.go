@@ -92,7 +92,7 @@ func main(){
 	wg.Add(1)
 
 	timeWGFunc := func(){
-	fmt.Println("New in line func clock")
+		fmt.Println("New in line func clock")
 		for i := 0; i < 5; i++{
 			var timeObj TimeObj
 		
@@ -113,6 +113,5 @@ func main(){
 	}
 
 	timeWGFunc()
-
 	
 }
