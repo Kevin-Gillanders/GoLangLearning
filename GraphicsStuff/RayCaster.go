@@ -55,9 +55,8 @@ func UpdateRays() {
 		// fmt.Printf("worldY : %v\n", worldY)
 		// fmt.Printf("           min : %v ==== max : %v\n", top, bot)
 		// fmt.Printf("Normalised min : %05f ==== max : %05f\n", float64(top)/float64(worldY), float64(bot)/float64(worldY))
-		offset := (NormaliseFloat(float64(idx), float64(len(rayCollection)) + 1))
-		startOfWall, endOfWall := ray.CalculateHeight(dist - dist * offset)
-
+		offset := (NormaliseFloat(float64(idx), float64(len(rayCollection))+1))
+		startOfWall, endOfWall := ray.CalculateHeight(dist - dist*offset)
 
 		ray = CastRay(
 			/*x1     :*/ position,
@@ -74,4 +73,3 @@ func UpdateRays() {
 		// floorLevel += step
 	}
 }
-
