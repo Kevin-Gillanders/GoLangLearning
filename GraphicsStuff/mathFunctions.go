@@ -17,3 +17,8 @@ func RadiansToDegrees(radians float64) float64{
 	return degrees
 
 }
+
+func NormaliseFloat(numberToNormalise float64, normalisedTo float64) float64{
+
+	return float64(numberToNormalise) / float64(normalisedTo)
+}
