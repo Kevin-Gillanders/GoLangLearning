@@ -5,33 +5,12 @@ import (
 	"image"
 	"image/color"
 	"log"
-	"math"
-	"math/rand"
+
+	// "math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	// "github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
-
-type Ray struct{
-    x1, y1 float64
-    x2, y2 float64
-
-    width float64
-
-    colour color.Color
-}
-
-
-func CreateARay(x1 float64, y1 float64, x2 float64, y2 float64, width float64, colour color.Color) *Ray{
-    return &Ray{
-        x1: x1,
-        y1: y1,
-        x2: x2,
-        y2: y2,
-        width: width,
-        colour: colour,
-    }
-}
 
 
 var emptyImage *ebiten.Image = ebiten.NewImage(3, 3)
@@ -40,17 +19,25 @@ var emptySubImage *ebiten.Image = emptyImage.SubImage(image.Rect(1, 1, 2, 2)).(*
 var rotationDegrees, rotationSpeed, rayWidth float64
 var worldX, worldY int
 
+var rayCollection [] *Ray
+
+
+
 func init() {
     emptyImage.Fill(color.White)
     
     worldX = 640 
     worldY = 480
     
-    rayWidth = 10
+    rayWidth = 5
 
     rotationDegrees = 0.0 
     rotationSpeed = 0.1 
 
+    // roof
+    // wall
+    // floor
+    rayCollection = make([]*Ray, worldX / int(rayWidth), worldX / int(rayWidth))
 
 }
 
@@ -67,34 +54,22 @@ func (g *Game) Update() error {
 
     // rotationDegrees = math.Mod(rotationDegrees + rotationSpeed, 360.0)
 
+    UpdateRays()
+
     return nil
 }
+
 
 // Draw draws the game screen.
 // Draw is called every frame (typically 1/60[s] for 60Hz display).
 func (g *Game) Draw(screen *ebiten.Image) {
     // Write your game's rendering.
-
-    for i := 0; i < worldX; i += int(rayWidth){
-
-        var red, blue, green  uint8
-
-        red = uint8(rand.Intn(255))
-        blue = uint8(rand.Intn(255))
-        green = uint8(rand.Intn(255))
-
-
-        c := color.RGBA{red, blue, green, 255}
-
-        ray := CreateARay(float64(i), 0, float64(i), float64(worldY) - 20, rayWidth, c)
-        CastRay(screen, ray)
+    fps := fmt.Sprintf("FPS : %v", ebiten.CurrentFPS())
+    
+    for _, ray := range rayCollection{ 
+        DrawRay(screen, ray)
     }
-
-
-    // ray1 := CreateARay(0, 0, 0, float64(worldY) - 20, 10, Blue())
-    // ray2 := CreateARay(10, 0, 10, float64(worldY) - 40, 10, Green())
-    // CastRay(screen, ray1)
-    // CastRay(screen, ray2)
+    ebitenutil.DebugPrint(screen, fps)   
 }
 
 // Layout takes the outside size (e.g., the window size) and returns the (logical) screen size.
@@ -105,38 +80,57 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 
 }
 
-func CastRay(dst *ebiten.Image, rayToCast *Ray) {
+func DrawRay(dst *ebiten.Image, rayToCast *Ray) {
     
-    length := math.Sqrt(math.Pow((rayToCast.x2 - rayToCast.x1), 2) + math.Pow((rayToCast.y2 - rayToCast.y1), 2))
-    fmt.Println("=============")
-    fmt.Printf("X1 : %05f, Y1 : %05f\n", rayToCast.x1, rayToCast.y1)
-    fmt.Printf("X2 : %05f, Y2 : %05f\n", rayToCast.x2, rayToCast.y2)
-    fmt.Printf("Length %05f\n", length)
-    fmt.Println("=============")
-
-
-    op := &ebiten.DrawImageOptions{}
-    
-    op.GeoM.Scale(rayToCast.width, length )
-
-
-    // op.GeoM.Rotate(DegreesToRadians(90))
-    op.GeoM.Translate(rayToCast.x1, 0)
-    // op.GeoM.Translate(0, y2)
-    op.ColorM.ScaleWithColor(rayToCast.colour)
-
-    // Filter must be 'nearest' filter (default).
-    // Linear filtering would make edges blurred.
-    dst.DrawImage(emptySubImage, op)
+    for _, op := range rayToCast.TransformRay() {
+        if op == nil{
+            continue
+        }
+        // Filter must be 'nearest' filter (default).
+        // Linear filtering would make edges blurred.
+        dst.DrawImage(emptySubImage, op)
+    }
 }
 
+
+func UpdateRays(){
+
+    for idx, ray := range rayCollection{
+        position := float64(idx) * rayWidth
+
+        // var red, blue, green  uint8
+
+        // red = uint8(rand.Intn(255))
+        // blue = uint8(rand.Intn(255))
+        // green = uint8(rand.Intn(255))
+
+
+        // c := color.RGBA{red, blue, green, 255}
+        // upperBound := float64(outerIdx * (worldY / 3))
+
+        ray = CastRay(
+                        /*x1     :*/ position, 
+                        /*y1     :*/ 0, 
+                        /*x2     :*/ position, 
+                        /*y2     :*/ float64(worldY), 
+                        /*wall x :*/ float64(worldY) * 0.33, 
+                        /*wall y :*/ float64(worldY) * 0.66, 
+                        /*width  :*/ rayWidth, 
+                        /*colour :*/ PickRandomColour(),
+                        )
+
+        rayCollection[idx] = ray
+    }
+
+    
+}
 
 
 func main() {
     game := &Game{}
     // Specify the window size as you like. Here, a doubled size is specified.
     ebiten.SetWindowSize(worldX, worldY)
-    ebiten.SetWindowTitle("Your game's title")
+    ebiten.SetWindowTitle("Go Raycasting engine")
     // Call ebiten.RunGame to start your game loop.
     if err := ebiten.RunGame(game); err != nil {
         log.Fatal(err)
