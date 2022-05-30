@@ -6,7 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func DrawRay(dst *ebiten.Image, rayToCast *Ray) {
+func DrawRay(dst *ebiten.Image, rayToCast *ray) {
 
 	for _, op := range rayToCast.TransformRay() {
 		if op == nil {

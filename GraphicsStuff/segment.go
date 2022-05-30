@@ -7,13 +7,13 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type Segment struct {
+type segment struct {
 	x1, y1 float64
 	x2, y2 float64
 	colour color.Color
 }
 
-func (seg *Segment) CreateTranformation(width float64) *ebiten.DrawImageOptions {
+func (seg *segment) CreateTranformation(width float64) *ebiten.DrawImageOptions {
 
 	length := math.Sqrt(math.Pow((seg.x2-seg.x1), 2) + math.Pow((seg.y2-seg.y1), 2))
 	// fmt.Println("=============")

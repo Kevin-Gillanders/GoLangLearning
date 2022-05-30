@@ -18,7 +18,7 @@ var emptySubImage *ebiten.Image = emptyImage.SubImage(image.Rect(1, 1, 2, 2)).(*
 var rotationDegrees, rotationSpeed, rayWidth float64
 var worldX, worldY int
 
-var rayCollection []*Ray
+var rayCollection []*ray
 var updateOnce bool = false
 var dist = 0.0
 var inc bool = false
@@ -48,7 +48,7 @@ func init() {
 	// roof
 	// wall
 	// floor
-	rayCollection = make([]*Ray, worldX/int(rayWidth), worldX/int(rayWidth))
+	rayCollection = make([]*ray, worldX/int(rayWidth), worldX/int(rayWidth))
 	UpdateRays()
 
 }

@@ -6,41 +6,41 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type Ray struct {
+type ray struct {
 	x1, y1 float64
 	x2, y2 float64
 
-	ceiling Segment
-	wall    Segment
-	floor   Segment
+	ceiling segment
+	wall    segment
+	floor   segment
 
 	width float64
 
 	colour color.Color
 }
 
-func CastRay(x1 float64, y1 float64, x2 float64, y2 float64, wallTopY float64, wallBotY float64, width float64, randomCol bool) *Ray {
+func CastRay(x1 float64, y1 float64, x2 float64, y2 float64, wallTopY float64, wallBotY float64, width float64, randomCol bool) *ray {
 
-	return &Ray{
+	return &ray{
 		x1: x1,
 		y1: y1,
 		x2: x2,
 		y2: y2,
-		ceiling: Segment{
+		ceiling: segment{
 			x1:     x1,
 			y1:     0,
 			x2:     x2,
 			y2:     wallTopY,
 			colour: Orange(),
 		},
-		wall: Segment{
+		wall: segment{
 			x1:     x1,
 			y1:     wallTopY,
 			x2:     x2,
 			y2:     wallBotY,
 			colour: Purple(),
 		},
-		floor: Segment{
+		floor: segment{
 			x1:     x1,
 			y1:     wallBotY,
 			x2:     x2,
@@ -51,14 +51,14 @@ func CastRay(x1 float64, y1 float64, x2 float64, y2 float64, wallTopY float64, w
 	}
 }
 
-func (ray *Ray) SetColours(ceilingColour color.Color, wallColour color.Color, floorColour color.Color) {
+func (ray *ray) SetColours(ceilingColour color.Color, wallColour color.Color, floorColour color.Color) {
 	ray.ceiling.colour = ceilingColour
 	ray.wall.colour = wallColour
 	ray.floor.colour = floorColour
 
 }
 
-func (rayToCast *Ray) TransformRay() []*ebiten.DrawImageOptions {
+func (rayToCast *ray) TransformRay() []*ebiten.DrawImageOptions {
 
 	// var ceiling, wall, floor *ebiten.DrawImageOptions
 	ceiling := rayToCast.ceiling.CreateTranformation(rayToCast.width)
@@ -68,7 +68,7 @@ func (rayToCast *Ray) TransformRay() []*ebiten.DrawImageOptions {
 	return []*ebiten.DrawImageOptions{ceiling, wall, floor}
 }
 
-func (ray *Ray) CalculateHeight(distance float64) (float64, float64) {
+func (ray *ray) CalculateHeight(distance float64) (float64, float64) {
 
 	//Start the wall as being non existant
 	var startOfWall, endOfWall float64
