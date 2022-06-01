@@ -5,3 +5,4 @@ type camera struct {
 	angle float64
 	fov float64
 }
+
