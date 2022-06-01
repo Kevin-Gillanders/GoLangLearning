@@ -58,7 +58,7 @@ func UpdateRays() {
 		offset := (NormaliseFloat(float64(idx), float64(len(rayCollection))+1))
 		startOfWall, endOfWall := ray.CalculateHeight(dist - dist*offset)
 
-		ray = CastRay(
+		ray = RayOutline(
 			/*x1     :*/ position,
 			/*y1     :*/ 0,
 			/*x2     :*/ position,
@@ -66,7 +66,7 @@ func UpdateRays() {
 			/*wall x :*/ startOfWall,
 			/*wall y :*/ endOfWall,
 			/*width  :*/ rayWidth,
-			/*colour :*/ false,
+			/*colour :*/ PickRandomColour(),
 		)
 		ray.SetColours(ceiling, wall, floor)
 		rayCollection[idx] = ray

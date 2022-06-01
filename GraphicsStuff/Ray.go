@@ -7,9 +7,6 @@ import (
 )
 
 type ray struct {
-	x1, y1 float64
-	x2, y2 float64
-
 	ceiling segment
 	wall    segment
 	floor   segment
@@ -19,13 +16,10 @@ type ray struct {
 	colour color.Color
 }
 
-func CastRay(x1 float64, y1 float64, x2 float64, y2 float64, wallTopY float64, wallBotY float64, width float64, randomCol bool) *ray {
+
+func RayOutline(x1 float64, y1 float64, x2 float64, y2 float64, wallTopY float64, wallBotY float64, width float64, entityCol color.Color) *ray {
 
 	return &ray{
-		x1: x1,
-		y1: y1,
-		x2: x2,
-		y2: y2,
 		ceiling: segment{
 			x1:     x1,
 			y1:     0,

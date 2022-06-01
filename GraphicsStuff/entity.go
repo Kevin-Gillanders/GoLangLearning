@@ -3,7 +3,9 @@ package main
 import "image/color"
 
 
-type entity struct {
-	x, y float64
-	colour color.Color
+type entity interface {
+	GetColour() color.Color
+	GetCoord() (float64, float64)
+	IsTransparent() bool
+	LineOfSightIntersect(float64, float64) bool
 }
