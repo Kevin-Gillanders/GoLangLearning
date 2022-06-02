@@ -1,24 +1,41 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func DrawRay(dst *ebiten.Image, rayToCast *ray) {
+type rayCaster struct{
+	rayCollection []*ray
+}
 
-	for _, op := range rayToCast.TransformRay() {
-		if op == nil {
-			continue
+func NewRayCaster(screenX int, screenY int, rayWidth float64) *rayCaster{
+	fmt.Printf("worldX %v  worldY %v\n", screenX, screenY)
+	fmt.Printf("screenX/int(rayWidth) %v  screenY/int(rayWidth) %v\n", screenX/int(rayWidth), screenY/int(rayWidth))
+	rayCollection := make([]*ray, screenX/int(rayWidth), screenX/int(rayWidth))
+	return &rayCaster{
+		rayCollection: rayCollection,
+	}
+
+}
+
+func (rayCaster *rayCaster) DrawRays (dst *ebiten.Image) {
+
+	for _, rayToCast := range rayCaster.rayCollection{
+		for _, op := range rayToCast.TransformRay() {
+			if op == nil {
+				continue
+			}
+			// Filter must be 'nearest' filter (default).
+			// Linear filtering would make edges blurred.
+			dst.DrawImage(emptySubImage, op)
 		}
-		// Filter must be 'nearest' filter (default).
-		// Linear filtering would make edges blurred.
-		dst.DrawImage(emptySubImage, op)
 	}
 }
 
-func UpdateRays() {
+func (rayCaster *rayCaster) UpdateRays() {
 	ceiling := color.Black
 	wall := DeepRed()
 	floor := color.White
@@ -27,7 +44,7 @@ func UpdateRays() {
 	// floorLevel := 0.0
 	// step := (float64(worldY) - floorLevel - wallWidth) / (float64(worldX) / rayWidth)
 	// step := 0.01
-	for idx, ray := range rayCollection {
+	for idx, ray := range rayCaster.rayCollection {
 		position := float64(idx) * rayWidth
 
 		// var red, blue, green  uint8
@@ -55,7 +72,8 @@ func UpdateRays() {
 		// fmt.Printf("worldY : %v\n", worldY)
 		// fmt.Printf("           min : %v ==== max : %v\n", top, bot)
 		// fmt.Printf("Normalised min : %05f ==== max : %05f\n", float64(top)/float64(worldY), float64(bot)/float64(worldY))
-		offset := (NormaliseFloat(float64(idx), float64(len(rayCollection))+1))
+		offset := (NormaliseFloat(float64(idx), 
+								  float64(len(rayCaster.rayCollection))+1))
 		startOfWall, endOfWall := ray.CalculateHeight(dist - dist*offset)
 
 		ray = RayOutline(
@@ -69,7 +87,7 @@ func UpdateRays() {
 			/*colour :*/ PickRandomColour(),
 		)
 		ray.SetColours(ceiling, wall, floor)
-		rayCollection[idx] = ray
+		rayCaster.rayCollection[idx] = ray
 		// floorLevel += step
 	}
 }

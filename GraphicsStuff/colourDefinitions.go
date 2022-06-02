@@ -5,6 +5,18 @@ import (
 	"math/rand"
 )
 
+func Black() color.Color {
+
+	c := color.Black
+	return c
+}
+
+func White() color.Color {
+
+	c := color.White
+	return c
+}
+
 func Blue() color.Color {
 
 	c := color.RGBA{0, 0, 255, 255}

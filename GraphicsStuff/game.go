@@ -15,41 +15,39 @@ import (
 var emptyImage *ebiten.Image = ebiten.NewImage(3, 3)
 var emptySubImage *ebiten.Image = emptyImage.SubImage(image.Rect(1, 1, 2, 2)).(*ebiten.Image)
 
-var rotationDegrees, rotationSpeed, rayWidth float64
+var rayWidth float64
 var worldX, worldY int
 
 var rayCollection []*ray
-var updateOnce bool = false
 var dist = 0.0
 var inc bool = false
 var step = 0.1
 
-var World [][]rune
+var World world
 
 func init() {
 	emptyImage.Fill(color.White)
 
-	World = [][]rune{
-		{'X', 'X', 'X', 'X', 'X'},
-		{'X', '>', '-', '-', 'X'},
-		{'X', '-', 'X', '-', 'X'},
-		{'X', '-', '-', '-', 'X'},
-		{'X', 'X', 'X', 'X', 'X'},
-	}
-
+	
 	worldX = 640
 	worldY = 480
 
-	rayWidth = 5
+    rayWidth = 20
+	worldOutline := [][] rune {
+        {'X', 'X', 'X', 'X', 'X'},
+        {'X', '>', '-', '-', 'X'},
+        {'X', '-', 'X', '-', 'X'},
+        {'X', '-', '-', '-', 'X'},
+        {'X', 'X', 'X', 'X', 'X'},
+    }
+    World = *CreateWorld( 
+        worldOutline,
+        rayWidth,
+        worldX,
+        worldY)
 
-	rotationDegrees = 0.0
-	rotationSpeed = 0.1
-
-	// roof
-	// wall
-	// floor
 	rayCollection = make([]*ray, worldX/int(rayWidth), worldX/int(rayWidth))
-	UpdateRays()
+	World.rayCaster.UpdateRays()
 
 }
 
@@ -64,9 +62,8 @@ func (g *Game) Update() error {
 	// yCoor2 = yCoor2 - math.Sin(1)
 
 	// rotationDegrees = math.Mod(rotationDegrees + rotationSpeed, 360.0)
-	if !updateOnce {
-		UpdateRays()
-	}
+	World.rayCaster.UpdateRays()
+	
 
 	dist = UpdateDist(dist, step)
 
@@ -93,9 +90,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// Write your game's rendering.
 	fps := fmt.Sprintf("FPS : %v", ebiten.CurrentFPS())
 
-	for _, ray := range rayCollection {
-		DrawRay(screen, ray)
-	}
+	
+	World.rayCaster.DrawRays(screen)
+
 	ebitenutil.DebugPrint(screen, fps)
 }
 
