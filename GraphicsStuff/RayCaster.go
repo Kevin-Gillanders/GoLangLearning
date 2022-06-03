@@ -8,14 +8,14 @@ import (
 )
 
 type rayCaster struct{
-	rayCollection []*ray
+	rayCollection []ray
 }
 
-func NewRayCaster(screenX int, screenY int, rayWidth float64) *rayCaster{
+func NewRayCaster(screenX int, screenY int, rayWidth float64) rayCaster{
 	fmt.Printf("worldX %v  worldY %v\n", screenX, screenY)
 	fmt.Printf("screenX/int(rayWidth) %v  screenY/int(rayWidth) %v\n", screenX/int(rayWidth), screenY/int(rayWidth))
-	rayCollection := make([]*ray, screenX/int(rayWidth), screenX/int(rayWidth))
-	return &rayCaster{
+	rayCollection := make([]ray, screenX/int(rayWidth), screenX/int(rayWidth))
+	return rayCaster{
 		rayCollection: rayCollection,
 	}
 

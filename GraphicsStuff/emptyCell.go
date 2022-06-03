@@ -11,8 +11,8 @@ type emptyCell struct{
 
 }
 
-func NewEmptyCell(x float64, y float64) *emptyCell{
-	return &emptyCell{
+func NewEmptyCell(x float64, y float64) emptyCell{
+	return emptyCell{
 		worldX: x,
 		worldY: y,
 		traversable: true,
@@ -21,23 +21,23 @@ func NewEmptyCell(x float64, y float64) *emptyCell{
 	}
 }
 
-func (emptyCell *emptyCell) GetColour() color.Color{
+func (emptyCell emptyCell) GetColour() color.Color{
 	return emptyCell.colour
 }
 
-func (emptyCell *emptyCell) GetCoord() (float64, float64){
+func (emptyCell emptyCell) GetCoord() (float64, float64){
 	return float64(emptyCell.worldX), float64(emptyCell.worldY)
 
 }
 
-func (emptyCell *emptyCell) IsTraversable() bool{
+func (emptyCell emptyCell) IsTraversable() bool{
 	return emptyCell.transparent
 }
 
-func (emptyCell *emptyCell) IsTransparent() bool{
+func (emptyCell emptyCell) IsTransparent() bool{
 	return emptyCell.transparent
 }
-func (emptyCell *emptyCell) LineOfSightIntersect(float64, float64) bool{
+func (emptyCell emptyCell) LineOfSightIntersect(float64, float64) bool{
 	//Todo this is the calc to see if a line passes more into a square than not
 	panic("emp LineOfSightIntersect Not implemented")
 }

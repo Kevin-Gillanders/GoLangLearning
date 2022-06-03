@@ -28,3 +28,14 @@ func DistanceBetweenTwoPoints(x1 float64, y1 float64, x2 float64, y2 float64) fl
 	//Pythagoras theorm
 	return math.Sqrt(math.Pow( x2 - x1 , 2) + math.Pow( y2 - y1 , 2) )
 }
+
+func DerivedNewPoint(x float64, y float64, distance float64, theta float64) (float64, float64){
+
+	//https://math.stackexchange.com/questions/143932/calculate-point-given-x-y-angle-and-distance
+	theta = DegreesToRadians(theta)
+
+	newX := x + (distance * math.Cos(theta))
+	newY := y + (distance * math.Sin(theta))
+
+	return newX, newY
+}
