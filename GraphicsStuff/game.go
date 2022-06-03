@@ -18,7 +18,7 @@ import (
 var emptyImage *ebiten.Image = ebiten.NewImage(3, 3)
 var emptySubImage *ebiten.Image = emptyImage.SubImage(image.Rect(1, 1, 2, 2)).(*ebiten.Image)
 
-var rayWidth float64
+var rayWidth, moveSpeed, rotationSpeed float64
 var worldX, worldY int
 
 var rayCollection []ray
@@ -36,7 +36,10 @@ func init() {
 	worldX = 640
 	worldY = 480
 
-    rayWidth = 20
+    rayWidth      = 20
+    moveSpeed     = 1
+    rotationSpeed = 1
+
 	worldOutline := [][] rune {
         {'X', 'X', 'X', 'X', 'X'},
         {'X', '>', '-', '-', 'X'},
@@ -44,11 +47,14 @@ func init() {
         {'X', '-', '-', '-', 'X'},
         {'X', 'X', 'X', 'X', 'X'},
     }
+
     World = CreateWorld( 
         worldOutline,
         rayWidth,
         worldX,
-        worldY)
+        worldY, 
+    	moveSpeed,
+    	rotationSpeed)
 
 	rayCollection = make([]ray, worldX/int(rayWidth), worldX/int(rayWidth))
 	World.rayCaster.UpdateRays()

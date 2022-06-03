@@ -18,7 +18,7 @@ type world struct {
 
 }
 
-func CreateWorld(worldDefinition [][]rune, rayWidth float64, screenX int, screenY int) world {
+func CreateWorld(worldDefinition [][]rune, rayWidth float64, screenX int, screenY int, moveSpeed float64, rotationSpeed float64) world {
 	fmt.Println("Creating world")
 	entities := [][] entity{}
 	var camera camera
@@ -45,8 +45,8 @@ func CreateWorld(worldDefinition [][]rune, rayWidth float64, screenX int, screen
 		x: len(entities[0]),
 		y: len(entities),
 		camera: camera,
-		rotationSpeed : 0.1,
-		movementSpeed : 0.1,
+		rotationSpeed : rotationSpeed,
+		movementSpeed : moveSpeed,
 		rayCaster: rayCaster,
 	}
 }
@@ -63,9 +63,8 @@ func (world world) UpdateCameraPosition(keys []ebiten.Key) world{
 
 	currentX, currentY, currentTheta := world.camera.GetCameraVector()
 	var distance, newTheta float64 
-    
-    newTheta = currentTheta
 
+	newTheta = currentTheta
 
 	for _, k := range keys{
 		//Todo add strafing if shift is held
@@ -78,19 +77,29 @@ func (world world) UpdateCameraPosition(keys []ebiten.Key) world{
 		switch k {
 			case ebiten.KeyA:
 			case ebiten.KeyArrowLeft:
-				newTheta += currentTheta - world.rotationSpeed
+				newTheta = (currentTheta - world.rotationSpeed)
+				fmt.Printf("Left <= currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
 				if newTheta < 0 {
 					newTheta = newTheta + 360
 				}
 			case ebiten.KeyW:
 			case ebiten.KeyArrowUp:
-				distance += -world.movementSpeed
+				distance = distance + world.movementSpeed
 			case ebiten.KeyS:
 			case ebiten.KeyArrowDown:
-				distance += +world.movementSpeed
+				distance = distance - world.movementSpeed
 			case ebiten.KeyD:
 			case ebiten.KeyArrowRight:
-				newTheta += math.Mod(currentTheta + world.rotationSpeed, 360)
+				newTheta = math.Mod(currentTheta + world.rotationSpeed, 360)
+				fmt.Printf("Right => currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
+			case ebiten.KeyR:
+				world.camera.UpdatePosition(1, 1, 0)
+				return world
+			case ebiten.KeySpace:
+				newTheta = math.Mod(currentTheta + 90, 360)
+			case ebiten.KeyL:
+				newTheta = math.Mod(currentTheta + 45, 360)
+
 		}
 	}
 	newX, newY := DerivedNewPoint(currentX, currentY, distance, newTheta) 
