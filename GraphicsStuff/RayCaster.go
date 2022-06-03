@@ -7,11 +7,11 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type rayCaster struct{
+type rayCaster struct {
 	rayCollection []ray
 }
 
-func NewRayCaster(screenX int, screenY int, rayWidth float64) rayCaster{
+func NewRayCaster(screenX int, screenY int, rayWidth float64) rayCaster {
 	fmt.Printf("worldX %v  worldY %v\n", screenX, screenY)
 	fmt.Printf("screenX/int(rayWidth) %v  screenY/int(rayWidth) %v\n", screenX/int(rayWidth), screenY/int(rayWidth))
 	rayCollection := make([]ray, screenX/int(rayWidth), screenX/int(rayWidth))
@@ -21,9 +21,9 @@ func NewRayCaster(screenX int, screenY int, rayWidth float64) rayCaster{
 
 }
 
-func (rayCaster *rayCaster) DrawRays (dst *ebiten.Image) {
+func (rayCaster *rayCaster) DrawRays(dst *ebiten.Image) {
 
-	for _, rayToCast := range rayCaster.rayCollection{
+	for _, rayToCast := range rayCaster.rayCollection {
 		for _, op := range rayToCast.TransformRay() {
 			if op == nil {
 				continue
@@ -72,8 +72,8 @@ func (rayCaster *rayCaster) UpdateRays() {
 		// fmt.Printf("worldY : %v\n", worldY)
 		// fmt.Printf("           min : %v ==== max : %v\n", top, bot)
 		// fmt.Printf("Normalised min : %05f ==== max : %05f\n", float64(top)/float64(worldY), float64(bot)/float64(worldY))
-		offset := (NormaliseFloat(float64(idx), 
-								  float64(len(rayCaster.rayCollection))+1))
+		offset := (NormaliseFloat(float64(idx),
+			float64(len(rayCaster.rayCollection))+1))
 		startOfWall, endOfWall := ray.CalculateHeight(dist - dist*offset)
 
 		ray = RayOutline(

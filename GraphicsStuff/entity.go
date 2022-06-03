@@ -2,7 +2,6 @@ package main
 
 import "image/color"
 
-
 type entity interface {
 	GetColour() color.Color
 	GetCoord() (float64, float64)

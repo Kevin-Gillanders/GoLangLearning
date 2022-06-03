@@ -16,7 +16,6 @@ type ray struct {
 	colour color.Color
 }
 
-
 func RayOutline(x1 float64, y1 float64, x2 float64, y2 float64, wallTopY float64, wallBotY float64, width float64, entityCol color.Color) ray {
 
 	return ray{

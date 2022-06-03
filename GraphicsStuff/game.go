@@ -32,29 +32,28 @@ var t = time.Now().Add(time.Second * 1)
 func init() {
 	emptyImage.Fill(color.White)
 
-	
 	worldX = 640
 	worldY = 480
 
-    rayWidth      = 20
-    moveSpeed     = 1
-    rotationSpeed = 1
+	rayWidth = 20
+	moveSpeed = 1
+	rotationSpeed = 1
 
-	worldOutline := [][] rune {
-        {'X', 'X', 'X', 'X', 'X'},
-        {'X', '>', '-', '-', 'X'},
-        {'X', '-', 'X', '-', 'X'},
-        {'X', '-', '-', '-', 'X'},
-        {'X', 'X', 'X', 'X', 'X'},
-    }
+	worldOutline := [][]rune{
+		{'X', 'X', 'X', 'X', 'X'},
+		{'X', '>', '-', '-', 'X'},
+		{'X', '-', 'X', '-', 'X'},
+		{'X', '-', '-', '-', 'X'},
+		{'X', 'X', 'X', 'X', 'X'},
+	}
 
-    World = CreateWorld( 
-        worldOutline,
-        rayWidth,
-        worldX,
-        worldY, 
-    	moveSpeed,
-    	rotationSpeed)
+	World = CreateWorld(
+		worldOutline,
+		rayWidth,
+		worldX,
+		worldY,
+		moveSpeed,
+		rotationSpeed)
 
 	rayCollection = make([]ray, worldX/int(rayWidth), worldX/int(rayWidth))
 	World.rayCaster.UpdateRays()
@@ -62,22 +61,21 @@ func init() {
 }
 
 // Game implements ebiten.Game interface.
-type Game struct{
-    keys []ebiten.Key
+type Game struct {
+	keys []ebiten.Key
 }
 
 // Update proceeds the game state.
 // Update is called every tick (1/60 [s] by default).
 func (g *Game) Update() error {
 
-    g.keys = inpututil.AppendPressedKeys(g.keys[:0])
+	g.keys = inpututil.AppendPressedKeys(g.keys[:0])
 
-    if(t.Before(time.Now()) ){
-        World = World.UpdateCameraPosition(g.keys)
-        t = time.Now().Add(time.Second)
-    }
+	if t.Before(time.Now()) {
+		World = World.UpdateCameraPosition(g.keys)
+		t = time.Now().Add(time.Second)
+	}
 	World.rayCaster.UpdateRays()
-	
 
 	dist = UpdateDist(dist, step)
 
@@ -85,7 +83,7 @@ func (g *Game) Update() error {
 }
 
 func UpdateDist(dist float64, step float64) float64 {
-    //TODO Remove this debug
+	//TODO Remove this debug
 	if dist >= 10.0 {
 		inc = false
 	}
@@ -105,20 +103,19 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// Write your game's rendering.
 	fps := fmt.Sprintf("FPS : %v", ebiten.CurrentFPS())
 
-	
-    World.rayCaster.DrawRays(screen)
+	World.rayCaster.DrawRays(screen)
 
-    if(len(g.keys) == 0){
-	   ebitenutil.DebugPrint(screen, fps)
+	if len(g.keys) == 0 {
+		ebitenutil.DebugPrint(screen, fps)
 
-    } else {
-        keyStrs := []string{}
-        for _, p := range g.keys {
-            keyStrs = append(keyStrs, p.String())
-        }
-        ebitenutil.DebugPrint(screen, strings.Join(keyStrs, ", "))
+	} else {
+		keyStrs := []string{}
+		for _, p := range g.keys {
+			keyStrs = append(keyStrs, p.String())
+		}
+		ebitenutil.DebugPrint(screen, strings.Join(keyStrs, ", "))
 
-    }
+	}
 }
 
 // Layout takes the outside size (e.g., the window size) and returns the (logical) screen size.
