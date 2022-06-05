@@ -29,22 +29,33 @@ var step = 0.1
 var World world
 var t = time.Now().Add(time.Second * 1)
 
+// Game implements ebiten.Game interface.
+type Game struct {
+    keys []ebiten.Key
+}
+
+
 func init() {
 	emptyImage.Fill(color.White)
 
 	worldX = 640
-	worldY = 480
+	worldY = 640
 
 	rayWidth = 20
 	moveSpeed = 1
 	rotationSpeed = 1
 
 	worldOutline := [][]rune{
-		{'X', 'X', 'X', 'X', 'X'},
-		{'X', '>', '-', '-', 'X'},
-		{'X', '-', 'X', '-', 'X'},
-		{'X', '-', '-', '-', 'X'},
-		{'X', 'X', 'X', 'X', 'X'},
+		{'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X'},
+		{'X', '>', '-', '-', '-', '-', '>', '-', '-', 'X'},
+		{'X', '-', 'X', '-', '-', '-', '-', 'X', '-', 'X'},
+		{'X', '-', '-', '-', '-', '-', '-', '-', '-', 'X'},
+		{'X', 'X', 'X', 'X', '-', '-', 'X', 'X', 'X', '-'},
+        {'X', 'X', 'X', 'X', '-', '-', 'X', 'X', 'X', 'X'},
+        {'X', '>', '-', '-', '-', '-', '>', '-', '-', 'X'},
+        {'X', '-', 'X', '-', '-', '-', '-', 'X', '-', 'X'},
+        {'X', '-', '-', '-', '-', '-', '-', '-', '-', 'X'},
+        {'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', '-'},
 	}
 
 	World = CreateWorld(
@@ -60,21 +71,16 @@ func init() {
 
 }
 
-// Game implements ebiten.Game interface.
-type Game struct {
-	keys []ebiten.Key
-}
-
 // Update proceeds the game state.
 // Update is called every tick (1/60 [s] by default).
 func (g *Game) Update() error {
 
 	g.keys = inpututil.AppendPressedKeys(g.keys[:0])
 
-	if t.Before(time.Now()) {
-		World = World.UpdateCameraPosition(g.keys)
-		t = time.Now().Add(time.Second)
-	}
+	// if t.Before(time.Now()) {
+	// 	// World = World.UpdateCameraPosition(g.keys)
+	// 	t = time.Now().Add(time.Second)
+	// }
 	World.rayCaster.UpdateRays()
 
 	dist = UpdateDist(dist, step)
@@ -103,7 +109,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// Write your game's rendering.
 	fps := fmt.Sprintf("FPS : %v", ebiten.CurrentFPS())
 
-	World.rayCaster.DrawRays(screen)
+	// World.rayCaster.DrawRays(screen)
+    World.Draw2DWorld(screen)
+    World.DrawGrid(screen)
 
 	if len(g.keys) == 0 {
 		ebitenutil.DebugPrint(screen, fps)
@@ -129,7 +137,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 func main() {
 	game := &Game{}
 	// Specify the window size as you like. Here, a doubled size is specified.
-	ebiten.SetWindowSize(worldX, worldY)
+	ebiten.SetWindowSize(worldY, worldX)
 	ebiten.SetWindowTitle("Go Raycasting engine")
 	// Call ebiten.RunGame to start your game loop.
 	if err := ebiten.RunGame(game); err != nil {
