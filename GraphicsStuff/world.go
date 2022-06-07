@@ -123,90 +123,86 @@ func (world world) UpdateCameraPosition(keys []ebiten.Key) world {
 	return world
 }
 
-func (world world) Draw2DWorld(screen *ebiten.Image){
+func (world world) Draw2DWorld(screen *ebiten.Image) {
 
-	screen.Fill(Green())//NRGBA{0xff, 0x00, 0x00, 0xff})	
+	screen.Fill(Green()) //NRGBA{0xff, 0x00, 0x00, 0xff})
 
 	squareX := worldX / len(world.entities)
 	squareY := worldY / len(world.entities)
-	
-	if square == nil{
+
+	if square == nil {
 		square = ebiten.NewImage(squareX, squareY)
-	    square.Fill(color.White)
+		square.Fill(color.White)
 	}
 
-	for iY, y := range world.entities{
+	for iY, y := range world.entities {
 		for iX, x := range y {
 			// Fill the screen with #FF0000 color
-		    // Fill the square with the white color
-	    	fmt.Println(x)
-		    // Create an empty option struct
-		    op := &ebiten.DrawImageOptions{}
-		    op.GeoM.Translate(float64(iX * squareX), float64(iY * squareY))
-		    op.ColorM.ScaleWithColor(x.GetColour())
-		    // fmt.Println(len(world.entities), len(world.entities))
+			// Fill the square with the white color
+			fmt.Println(x)
+			// Create an empty option struct
+			op := &ebiten.DrawImageOptions{}
+			op.GeoM.Translate(float64(iX*squareX), float64(iY*squareY))
+			op.ColorM.ScaleWithColor(x.GetColour())
+			// fmt.Println(len(world.entities), len(world.entities))
 
-		    // Draw the square image to the screen with an empty option
-		    screen.DrawImage(square, op)
+			// Draw the square image to the screen with an empty option
+			screen.DrawImage(square, op)
 		}
 	}
 }
 
-func (world world) DrawGrid(screen *ebiten.Image){
+func (world world) DrawGrid(screen *ebiten.Image) {
 
 	squareY := worldY / len(world.entities)
 	squareX := worldX / len(world.entities[0])
 
-	if line == nil{
+	if line == nil {
 		line = ebiten.NewImage(2, worldX)
-	    line.Fill(color.White)
+		line.Fill(color.White)
 	}
 
-    
+	for x := 0; x <= worldX/squareX; x++ {
 
-	for x := 0; x <= worldX / squareX; x++ {
+		op := &ebiten.DrawImageOptions{}
 
-	    op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(float64(x*squareX), 0)
+		op.ColorM.ScaleWithColor(Black())
 
-	    op.GeoM.Translate(float64(x * squareX), 0)
-	    op.ColorM.ScaleWithColor(Black())
-	    
-
-	    // Draw the line image to the screen with an empty option
-	    screen.DrawImage(line, op)
-	} 
+		// Draw the line image to the screen with an empty option
+		screen.DrawImage(line, op)
+	}
 
 	line = ebiten.NewImage(2, worldY)
 	line.Fill(color.White)
 
-	for y := 0; y <= worldY / squareY; y++ {
+	for y := 0; y <= worldY/squareY; y++ {
 		fmt.Println("y", y)
 		fmt.Println("squareY", squareY)
-		fmt.Println("worldY" , worldY)
-		fmt.Println("worldY / squareY" , worldY / squareY)
+		fmt.Println("worldY", worldY)
+		fmt.Println("worldY / squareY", worldY/squareY)
 		fmt.Println("================")
-	    op := &ebiten.DrawImageOptions{}
+		op := &ebiten.DrawImageOptions{}
 
-	    op.GeoM.Translate(float64(y * squareY), 0 )
-	    op.ColorM.ScaleWithColor(Black())
-			    
+		op.GeoM.Translate(float64(y*squareY), 0)
+		op.ColorM.ScaleWithColor(Black())
 
-	    // Draw the line image to the screen with an empty option
-	    screen.DrawImage(line, op)
-	} 
+		// Draw the line image to the screen with an empty option
+		screen.DrawImage(line, op)
+	}
 
 	// for iY, y := range world.entities {
 	// 	for iX := range y {
 	//         // Create an 16x16 image
-	//         line = ebiten.NewImage(2, 2) 
+	//         line = ebiten.NewImage(2, 2)
 	// 	    //Horizontal
 	//         line = ebiten.NewImage(2, squareX)
 	// 	    line.Fill(color.Black)
 
 	// 	    op := &ebiten.DrawImageOptions{}
 
- //    	    op.GeoM.Translate(float64(iX * squareX), float64(iY * squareY))
-		    
+	//    	    op.GeoM.Translate(float64(iX * squareX), float64(iY * squareY))
+
 	// 	    fmt.Println(float64(iX * squareX), float64(iY * squareY))
 
 	// 	    // Draw the square image to the screen with an empty option
@@ -218,16 +214,13 @@ func (world world) DrawGrid(screen *ebiten.Image){
 
 	// 	    op = &ebiten.DrawImageOptions{}
 
- //    	    op.GeoM.Translate(float64(iX * squareX), float64(iY * squareY))
-		    
+	//    	    op.GeoM.Translate(float64(iX * squareX), float64(iY * squareY))
+
 	// 	    fmt.Println(float64(iX * squareX), float64(iY * squareY))
 
 	// 	    // Draw the square image to the screen with an empty option
 	// 	    screen.DrawImage(line, op)
 
-
 	// 	}
 	// }
 }
-
-

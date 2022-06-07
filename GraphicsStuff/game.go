@@ -31,9 +31,8 @@ var t = time.Now().Add(time.Second * 1)
 
 // Game implements ebiten.Game interface.
 type Game struct {
-    keys []ebiten.Key
+	keys []ebiten.Key
 }
-
 
 func init() {
 	emptyImage.Fill(color.White)
@@ -51,11 +50,11 @@ func init() {
 		{'X', '-', 'X', '-', '-', '-', '-', 'X', '-', 'X'},
 		{'X', '-', '-', '-', '-', '-', '-', '-', '-', 'X'},
 		{'X', 'X', 'X', 'X', '-', '-', 'X', 'X', 'X', '-'},
-        {'X', 'X', 'X', 'X', '-', '-', 'X', 'X', 'X', 'X'},
-        {'X', '>', '-', '-', '-', '-', '>', '-', '-', 'X'},
-        {'X', '-', 'X', '-', '-', '-', '-', 'X', '-', 'X'},
-        {'X', '-', '-', '-', '-', '-', '-', '-', '-', 'X'},
-        {'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', '-'},
+		{'X', 'X', 'X', 'X', '-', '-', 'X', 'X', 'X', 'X'},
+		{'X', '>', '-', '-', '-', '-', '>', '-', '-', 'X'},
+		{'X', '-', 'X', '-', '-', '-', '-', 'X', '-', 'X'},
+		{'X', '-', '-', '-', '-', '-', '-', '-', '-', 'X'},
+		{'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', '-'},
 	}
 
 	World = CreateWorld(
@@ -66,7 +65,7 @@ func init() {
 		moveSpeed,
 		rotationSpeed)
 
-	rayCollection = make([]ray, worldX/int(rayWidth), worldX/int(rayWidth))
+	rayCollection = make([]ray, worldX/int(rayWidth))
 	World.rayCaster.UpdateRays()
 
 }
@@ -110,8 +109,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	fps := fmt.Sprintf("FPS : %v", ebiten.CurrentFPS())
 
 	// World.rayCaster.DrawRays(screen)
-    World.Draw2DWorld(screen)
-    World.DrawGrid(screen)
+	World.Draw2DWorld(screen)
+	World.DrawGrid(screen)
 
 	if len(g.keys) == 0 {
 		ebitenutil.DebugPrint(screen, fps)
