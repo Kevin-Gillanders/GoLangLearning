@@ -15,6 +15,8 @@ var square *ebiten.Image
 var cameraImage *ebiten.Image
 var line *ebiten.Image
 
+var lineX, lineY int
+
 type world struct {
 	x, y     int
 	camera   camera
@@ -27,6 +29,10 @@ type world struct {
 
 func CreateWorld(worldDefinition [][]rune, rayWidth float64, screenX int, screenY int, moveSpeed float64, rotationSpeed float64) world {
 	fmt.Println("Creating world")
+
+	lineX = 20
+	lineY = 2
+
 	entities := [][]entity{}
 	var camera camera
 	for y, row := range worldDefinition {
@@ -81,31 +87,49 @@ func (world world) UpdateCameraPosition(keys []ebiten.Key) world {
 		// S, v  : +Y
 		//TODO Debug this as the behaviour is incorrect
 		switch k {
-		case ebiten.KeyA:
-		case ebiten.KeyArrowLeft:
-			newTheta = (currentTheta - world.rotationSpeed)
-			fmt.Printf("Left <= currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
-			if newTheta < 0 {
-				newTheta = newTheta + 360
-			}
-		case ebiten.KeyW:
-		case ebiten.KeyArrowUp:
-			distance = distance + world.movementSpeed
-		case ebiten.KeyS:
-		case ebiten.KeyArrowDown:
-			distance = distance - world.movementSpeed
-		case ebiten.KeyD:
-		case ebiten.KeyArrowRight:
-			newTheta = math.Mod(currentTheta+world.rotationSpeed, 360)
-			fmt.Printf("Right => currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
-		case ebiten.KeyR:
-			world.camera.UpdatePosition(1, 1, 0)
-			return world
-		case ebiten.KeySpace:
-			newTheta = math.Mod(currentTheta+90, 360)
-		case ebiten.KeyL:
-			newTheta = math.Mod(currentTheta+45, 360)
-
+		
+			case ebiten.KeyA:
+			case ebiten.KeyArrowLeft:
+				newTheta = (currentTheta - world.rotationSpeed)
+				fmt.Printf("Left <= currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
+				if newTheta < 0 {
+					newTheta = newTheta + 360
+				}
+			
+			case ebiten.KeyW:
+			case ebiten.KeyArrowUp:
+				distance = distance + world.movementSpeed
+			
+			case ebiten.KeyS:
+			case ebiten.KeyArrowDown:
+				distance = distance - world.movementSpeed
+			
+			case ebiten.KeyD:
+			case ebiten.KeyArrowRight:
+				newTheta = math.Mod(currentTheta+world.rotationSpeed, 360)
+				fmt.Printf("Right => currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
+			
+			case ebiten.KeyR:
+				world.camera.UpdatePosition(1, 1, 0)
+				return world
+			
+			case ebiten.KeySpace:
+				newTheta = math.Mod(currentTheta+90, 360)
+			
+			case ebiten.KeyL:
+				newTheta = math.Mod(currentTheta+45, 360)
+			
+			case ebiten.KeyZ:
+				lineX ++
+				line = ebiten.NewImage(lineX, lineY)
+				line.Fill(color.White)
+			
+			case ebiten.KeyX:
+				if lineX > 1 {
+					lineX --
+					line = ebiten.NewImage(lineX, lineY)
+					line.Fill(color.White)
+				}
 		}
 	}
 	newX, newY := DerivedNewPoint(currentX, currentY, distance, newTheta)
@@ -127,17 +151,14 @@ func (world world) UpdateCameraPosition(keys []ebiten.Key) world {
 
 func (world world) Draw2DWorld(screen *ebiten.Image) {
 
-	screen.Fill(Green()) //NRGBA{0xff, 0x00, 0x00, 0xff})
+	screen.Fill(Black()) //NRGBA{0xff, 0x00, 0x00, 0xff})
 
 	squareX := worldX / len(world.entities)
 	squareY := worldY / len(world.entities)
 
-	if square == nil || cameraImage == nil {
-		square = ebiten.NewImage(squareX, squareY)
+	if square == nil {
+		square = ebiten.NewImage(squareX - 1, squareY - 1)
 		square.Fill(color.White)
-
-		cameraImage = ebiten.NewImage(world.camera.mapSize, world.camera.mapSize)
-		cameraImage.Fill(color.White)
 	}
 
 	for iY, y := range world.entities {
@@ -147,7 +168,7 @@ func (world world) Draw2DWorld(screen *ebiten.Image) {
 			// fmt.Println(reflect.TypeOf(x))
 			// fmt.Println(float64(iX) * float64(x.GetSize()), float64(iY) * float64(x.GetSize()))
 			op := &ebiten.DrawImageOptions{}
-			op.GeoM.Translate(float64(iX) * float64(64) - 1, float64(iY) * float64(64) - 1)	
+			op.GeoM.Translate(float64(iX) * float64(x.GetSize()), float64(iY) * float64(x.GetSize()))	
 			op.ColorM.ScaleWithColor(x.GetColour())
 			// Create an empty option struct
 			// fmt.Println(len(world.entities), len(world.entities))
@@ -157,89 +178,122 @@ func (world world) Draw2DWorld(screen *ebiten.Image) {
 		}
 	}
 
+	world.DrawCamera(screen)
+	
+
+
+}
+
+
+func (world world) DrawCamera(screen *ebiten.Image){
+
+	if cameraImage == nil || line == nil{
+		line = ebiten.NewImage(lineX, lineY)
+		line.Fill(color.White)
+		cameraImage = ebiten.NewImage(world.camera.mapSize, world.camera.mapSize)
+		cameraImage.Fill(color.White)
+	}
+
 	camX, camY := world.camera.GetCoord()
 	op := &ebiten.DrawImageOptions{}
 
+
+	camX = float64(camX) * float64(world.camera.mapSize)
+	camY = float64(camY) * float64(world.camera.mapSize)
+
 	fmt.Println(reflect.TypeOf(world.camera))
-	fmt.Println(float64(camX) * float64(world.camera.mapSize), float64(camY) * float64(world.camera.mapSize))
+	fmt.Println(camX, camY)
 
-	op.GeoM.Translate(float64(camX) * float64(world.camera.mapSize), float64(camY) * float64(world.camera.mapSize))	
+	op.GeoM.Translate(camX, camY)	
 	op.ColorM.ScaleWithColor(world.camera.colour)
-	
-
 	screen.DrawImage(cameraImage, op)
 
+
+	op = &ebiten.DrawImageOptions{}
+
+
+	op.GeoM.Rotate(DegreesToRadians(world.camera.angle))
+
+
+	op.GeoM.Translate(camX + (float64(world.camera.mapSize) / 2), camY + (float64(world.camera.mapSize) / 2))	
+	op.ColorM.ScaleWithColor(Black())
+
+	screen.DrawImage(line, op)
+
+
 }
 
-func (world world) DrawGrid(screen *ebiten.Image) {
 
-	squareY := worldY / len(world.entities)
-	squareX := worldX / len(world.entities[0])
 
-	if line == nil {
-		line = ebiten.NewImage(2, worldX)
-		line.Fill(color.White)
-	}
+// func (world world) DrawGrid(screen *ebiten.Image) {
 
-	for x := 0; x <= worldX/squareX; x++ {
+// 	squareY := worldY / len(world.entities)
+// 	squareX := worldX / len(world.entities[0])
 
-		op := &ebiten.DrawImageOptions{}
+// 	if line == nil {
+// 		line = ebiten.NewImage(2, worldX)
+// 		line.Fill(color.White)
+// 	}
 
-		op.GeoM.Translate(float64(x*squareX), 0)
-		op.ColorM.ScaleWithColor(Black())
+// 	for x := 0; x <= worldX/squareX; x++ {
 
-		// Draw the line image to the screen with an empty option
-		screen.DrawImage(line, op)
-	}
+// 		op := &ebiten.DrawImageOptions{}
 
-	line = ebiten.NewImage(2, worldY)
-	line.Fill(color.White)
+// 		op.GeoM.Translate(float64(x*squareX), 0)
+// 		op.ColorM.ScaleWithColor(Black())
 
-	for y := 0; y <= worldY/squareY; y++ {
-		fmt.Println("y", y)
-		fmt.Println("squareY", squareY)
-		fmt.Println("worldY", worldY)
-		fmt.Println("worldY / squareY", worldY/squareY)
-		fmt.Println("================")
-		op := &ebiten.DrawImageOptions{}
+// 		// Draw the line image to the screen with an empty option
+// 		screen.DrawImage(line, op)
+// 	}
 
-		op.GeoM.Translate(float64(y*squareY), 0)
-		op.ColorM.ScaleWithColor(Black())
+// 	line = ebiten.NewImage(2, worldY)
+// 	line.Fill(color.White)
 
-		// Draw the line image to the screen with an empty option
-		screen.DrawImage(line, op)
-	}
+// 	for y := 0; y <= worldY/squareY; y++ {
+// 		fmt.Println("y", y)
+// 		fmt.Println("squareY", squareY)
+// 		fmt.Println("worldY", worldY)
+// 		fmt.Println("worldY / squareY", worldY/squareY)
+// 		fmt.Println("================")
+// 		op := &ebiten.DrawImageOptions{}
 
-	// for iY, y := range world.entities {
-	// 	for iX := range y {
-	//         // Create an 16x16 image
-	//         line = ebiten.NewImage(2, 2)
-	// 	    //Horizontal
-	//         line = ebiten.NewImage(2, squareX)
-	// 	    line.Fill(color.Black)
+// 		op.GeoM.Translate(float64(y*squareY), 0)
+// 		op.ColorM.ScaleWithColor(Black())
 
-	// 	    op := &ebiten.DrawImageOptions{}
+// 		// Draw the line image to the screen with an empty option
+// 		screen.DrawImage(line, op)
+// 	}
 
-	//    	    op.GeoM.Translate(float64(iX * squareX), float64(iY * squareY))
+// 	// for iY, y := range world.entities {
+// 	// 	for iX := range y {
+// 	//         // Create an 16x16 image
+// 	//         line = ebiten.NewImage(2, 2)
+// 	// 	    //Horizontal
+// 	//         line = ebiten.NewImage(2, squareX)
+// 	// 	    line.Fill(color.Black)
 
-	// 	    fmt.Println(float64(iX * squareX), float64(iY * squareY))
+// 	// 	    op := &ebiten.DrawImageOptions{}
 
-	// 	    // Draw the square image to the screen with an empty option
-	// 	    screen.DrawImage(line, op)
+// 	//    	    op.GeoM.Translate(float64(iX * squareX), float64(iY * squareY))
 
-	// 	    //Vertical
-	//         line = ebiten.NewImage(squareY, 2)
-	// 	    line.Fill(color.Black)
+// 	// 	    fmt.Println(float64(iX * squareX), float64(iY * squareY))
 
-	// 	    op = &ebiten.DrawImageOptions{}
+// 	// 	    // Draw the square image to the screen with an empty option
+// 	// 	    screen.DrawImage(line, op)
 
-	//    	    op.GeoM.Translate(float64(iX * squareX), float64(iY * squareY))
+// 	// 	    //Vertical
+// 	//         line = ebiten.NewImage(squareY, 2)
+// 	// 	    line.Fill(color.Black)
 
-	// 	    fmt.Println(float64(iX * squareX), float64(iY * squareY))
+// 	// 	    op = &ebiten.DrawImageOptions{}
 
-	// 	    // Draw the square image to the screen with an empty option
-	// 	    screen.DrawImage(line, op)
+// 	//    	    op.GeoM.Translate(float64(iX * squareX), float64(iY * squareY))
 
-	// 	}
-	// }
-}
+// 	// 	    fmt.Println(float64(iX * squareX), float64(iY * squareY))
+
+// 	// 	    // Draw the square image to the screen with an empty option
+// 	// 	    screen.DrawImage(line, op)
+
+// 	// 	}
+// 	// }
+// }

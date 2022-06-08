@@ -41,8 +41,8 @@ func init() {
 	worldY = 640
 
 	rayWidth = 20
-	moveSpeed = 1
-	rotationSpeed = 1
+	moveSpeed = .5
+	rotationSpeed = 5
 
 	worldOutline := [][]rune{
 		{'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X'},
@@ -77,7 +77,7 @@ func (g *Game) Update() error {
 	g.keys = inpututil.AppendPressedKeys(g.keys[:0])
 
 	// if t.Before(time.Now()) {
-	// 	// World = World.UpdateCameraPosition(g.keys)
+	World = World.UpdateCameraPosition(g.keys)
 	// 	t = time.Now().Add(time.Second)
 	// }
 	World.rayCaster.UpdateRays()
@@ -107,11 +107,10 @@ func UpdateDist(dist float64, step float64) float64 {
 func (g *Game) Draw(screen *ebiten.Image) {
 	// Write your game's rendering.
 	fps := fmt.Sprintf("FPS : %v", ebiten.CurrentFPS())
+	World.Draw2DWorld(screen)
 
 	// World.rayCaster.DrawRays(screen)
-	World.Draw2DWorld(screen)
 	// World.DrawGrid(screen)
-
 	if len(g.keys) == 0 {
 		ebitenutil.DebugPrint(screen, fps)
 
@@ -123,6 +122,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		ebitenutil.DebugPrint(screen, strings.Join(keyStrs, ", "))
 
 	}
+
 }
 
 // Layout takes the outside size (e.g., the window size) and returns the (logical) screen size.

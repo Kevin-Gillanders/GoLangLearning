@@ -22,7 +22,7 @@ func NewCamera(x float64, y float64) camera {
 		angle:       0,
 		fov:         90,
 		unitSize:    64,
-		mapSize:     10,
+		mapSize:     15,
 		traversable: true,
 		transparent: true,
 		colour:      Green(),
