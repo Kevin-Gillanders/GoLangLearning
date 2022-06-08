@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image/color"
+	"reflect"
 
 	// "image/color"
 	"math"
@@ -11,6 +12,7 @@ import (
 )
 
 var square *ebiten.Image
+var cameraImage *ebiten.Image
 var line *ebiten.Image
 
 type world struct {
@@ -130,26 +132,43 @@ func (world world) Draw2DWorld(screen *ebiten.Image) {
 	squareX := worldX / len(world.entities)
 	squareY := worldY / len(world.entities)
 
-	if square == nil {
+	if square == nil || cameraImage == nil {
 		square = ebiten.NewImage(squareX, squareY)
 		square.Fill(color.White)
+
+		cameraImage = ebiten.NewImage(world.camera.mapSize, world.camera.mapSize)
+		cameraImage.Fill(color.White)
 	}
 
 	for iY, y := range world.entities {
 		for iX, x := range y {
 			// Fill the screen with #FF0000 color
 			// Fill the square with the white color
-			fmt.Println(x)
-			// Create an empty option struct
+			// fmt.Println(reflect.TypeOf(x))
+			// fmt.Println(float64(iX) * float64(x.GetSize()), float64(iY) * float64(x.GetSize()))
 			op := &ebiten.DrawImageOptions{}
-			op.GeoM.Translate(float64(iX*squareX), float64(iY*squareY))
+			op.GeoM.Translate(float64(iX) * float64(64) - 1, float64(iY) * float64(64) - 1)	
 			op.ColorM.ScaleWithColor(x.GetColour())
+			// Create an empty option struct
 			// fmt.Println(len(world.entities), len(world.entities))
 
 			// Draw the square image to the screen with an empty option
 			screen.DrawImage(square, op)
 		}
 	}
+
+	camX, camY := world.camera.GetCoord()
+	op := &ebiten.DrawImageOptions{}
+
+	fmt.Println(reflect.TypeOf(world.camera))
+	fmt.Println(float64(camX) * float64(world.camera.mapSize), float64(camY) * float64(world.camera.mapSize))
+
+	op.GeoM.Translate(float64(camX) * float64(world.camera.mapSize), float64(camY) * float64(world.camera.mapSize))	
+	op.ColorM.ScaleWithColor(world.camera.colour)
+	
+
+	screen.DrawImage(cameraImage, op)
+
 }
 
 func (world world) DrawGrid(screen *ebiten.Image) {

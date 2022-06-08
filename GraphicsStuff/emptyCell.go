@@ -4,6 +4,7 @@ import "image/color"
 
 type emptyCell struct {
 	worldX, worldY float64
+	unitSize       int
 	traversable    bool
 	transparent    bool
 	colour         color.Color
@@ -13,6 +14,7 @@ func NewEmptyCell(x float64, y float64) emptyCell {
 	return emptyCell{
 		worldX:      x,
 		worldY:      y,
+		unitSize:    64,
 		traversable: true,
 		transparent: true,
 		colour:      White(),
@@ -35,7 +37,12 @@ func (emptyCell emptyCell) IsTraversable() bool {
 func (emptyCell emptyCell) IsTransparent() bool {
 	return emptyCell.transparent
 }
+
 func (emptyCell emptyCell) LineOfSightIntersect(float64, float64) bool {
 	//Todo this is the calc to see if a line passes more into a square than not
 	panic("emp LineOfSightIntersect Not implemented")
+}
+
+func (emptyCell emptyCell) GetSize() int{
+	return emptyCell.unitSize
 }

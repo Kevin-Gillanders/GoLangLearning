@@ -4,6 +4,7 @@ import "image/color"
 
 type wall struct {
 	worldX, worldY float64
+	unitSize       int 
 	traversable    bool
 	transparent    bool
 	colour         color.Color
@@ -13,6 +14,7 @@ func NewWall(x float64, y float64) wall {
 	return wall{
 		worldX:      x,
 		worldY:      y,
+		unitSize:    64,
 		traversable: false,
 		transparent: false,
 		colour:      Red(),
@@ -39,4 +41,8 @@ func (wall wall) IsTraversable() bool {
 func (wall wall) LineOfSightIntersect(float64, float64) bool {
 	//Todo this is the calc to see if a line passes more into a square than not
 	panic("wall los Not implemented")
+}
+
+func (wall wall) GetSize() int{
+	return wall.unitSize
 }

@@ -110,7 +110,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	// World.rayCaster.DrawRays(screen)
 	World.Draw2DWorld(screen)
-	World.DrawGrid(screen)
+	// World.DrawGrid(screen)
 
 	if len(g.keys) == 0 {
 		ebitenutil.DebugPrint(screen, fps)

@@ -6,6 +6,7 @@ import (
 
 type camera struct {
 	worldPosX, worldPosY float64
+	unitSize, mapSize    int
 	angle                float64
 	fov                  float64
 
@@ -20,14 +21,16 @@ func NewCamera(x float64, y float64) camera {
 		worldPosY:   y,
 		angle:       0,
 		fov:         90,
+		unitSize:    64,
+		mapSize:     10,
 		traversable: true,
 		transparent: true,
-		colour:      White(),
+		colour:      Green(),
 	}
 }
 
 func (camera camera) GetColour() color.Color {
-	return camera.colour
+	return color.White
 }
 
 func (camera camera) GetCoord() (float64, float64) {
@@ -56,4 +59,7 @@ func (camera *camera) UpdatePosition(newX float64, newY float64, newAngle float6
 	camera.worldPosX = newX
 	camera.worldPosY = newY
 	camera.angle = newAngle
+}
+func (camera camera) GetSize() int{
+	return camera.unitSize
 }
