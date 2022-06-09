@@ -31,7 +31,7 @@ func CreateWorld(worldDefinition [][]rune, rayWidth float64, screenX int, screen
 	fmt.Println("Creating world")
 
 	lineX = 20
-	lineY = 2
+	lineY = 1
 
 	entities := [][]entity{}
 	var camera camera
@@ -52,7 +52,7 @@ func CreateWorld(worldDefinition [][]rune, rayWidth float64, screenX int, screen
 		}
 		entities = append(entities, entityRow)
 	}
-	rayCaster := NewRayCaster(screenX, screenY, rayWidth)
+	rayCaster := NewRayCaster(int(camera.fov), rayWidth)
 	return world{
 		entities:      entities,
 		x:             len(entities[0]),
@@ -75,39 +75,78 @@ func (world world) UpdateCameraPosition(keys []ebiten.Key) world {
 
 	currentX, currentY, currentTheta := world.camera.GetCameraVector()
 	var distance, newTheta float64
-
+	
+	newX := currentX
+	newY := currentY
 	newTheta = currentTheta
 
 	for _, k := range keys {
-		//Todo add strafing if shift is held
-		// A, <- : Angle of rotation - rotation speed
-		// D, -> : Angle of rotation + rotation speed
+		// <- : Angle of rotation - rotation speed
+		// -> : Angle of rotation + rotation speed
 
-		// W, ^  : -Y
-		// S, v  : +Y
-		//TODO Debug this as the behaviour is incorrect
+		// ^  : -Y
+		// v  : +Y
+
+		// A : x - MS
+		// D : x + MS
+
+		// W : Y - MS
+		// S : Y + MS
 		switch k {
-		
+			//Grid controls
 			case ebiten.KeyA:
+				newX = currentX - moveSpeed
+				newY = currentY
+			
+			case ebiten.KeyW:
+				newX = currentX 
+				newY = currentY - moveSpeed
+			
+			case ebiten.KeyS:
+				newX = currentX 
+				newY = currentY + moveSpeed
+			
+			case ebiten.KeyD:
+				newX = currentX + moveSpeed
+				newY = currentY 
+			
+			case ebiten.KeyQ:
+				newTheta = (currentTheta - world.rotationSpeed)
+				fmt.Printf("Left <= currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
+				if newTheta < 0 {
+					newTheta = newTheta + 360
+				}
+				newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
+
+			case ebiten.KeyE:
+				newTheta = math.Mod(currentTheta+world.rotationSpeed, 360)
+				fmt.Printf("Right => currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
+				newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
+			
+
+
+
+			//Tank controls
 			case ebiten.KeyArrowLeft:
 				newTheta = (currentTheta - world.rotationSpeed)
 				fmt.Printf("Left <= currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
 				if newTheta < 0 {
 					newTheta = newTheta + 360
 				}
-			
-			case ebiten.KeyW:
+				newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
+
 			case ebiten.KeyArrowUp:
 				distance = distance + world.movementSpeed
-			
-			case ebiten.KeyS:
+				newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
+				
 			case ebiten.KeyArrowDown:
 				distance = distance - world.movementSpeed
+				newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
 			
-			case ebiten.KeyD:
 			case ebiten.KeyArrowRight:
 				newTheta = math.Mod(currentTheta+world.rotationSpeed, 360)
 				fmt.Printf("Right => currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
+				newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
 			
 			case ebiten.KeyR:
 				world.camera.UpdatePosition(1, 1, 0)
@@ -132,7 +171,6 @@ func (world world) UpdateCameraPosition(keys []ebiten.Key) world {
 				}
 		}
 	}
-	newX, newY := DerivedNewPoint(currentX, currentY, distance, newTheta)
 
 	world.camera.UpdatePosition(newX, newY, newTheta)
 
@@ -209,17 +247,19 @@ func (world world) DrawCamera(screen *ebiten.Image){
 	screen.DrawImage(cameraImage, op)
 
 
-	op = &ebiten.DrawImageOptions{}
+	for i, ray := range world.rayCaster.rayCollection{
 
-
-	op.GeoM.Rotate(DegreesToRadians(world.camera.angle))
-
-
-	op.GeoM.Translate(camX + (float64(world.camera.mapSize) / 2), camY + (float64(world.camera.mapSize) / 2))	
-	op.ColorM.ScaleWithColor(Black())
-
-	screen.DrawImage(line, op)
-
+		op = &ebiten.DrawImageOptions{}
+	
+	
+		op.GeoM.Rotate(DegreesToRadians(world.camera.angle + (float64(i) * ray.width)))
+	
+	
+		op.GeoM.Translate(camX + (float64(world.camera.mapSize) / 2), camY + (float64(world.camera.mapSize) / 2))	
+		op.ColorM.ScaleWithColor(Black())
+	
+		screen.DrawImage(line, op)
+	}
 
 }
 

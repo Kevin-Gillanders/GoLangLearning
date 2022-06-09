@@ -21,7 +21,7 @@ var emptySubImage *ebiten.Image = emptyImage.SubImage(image.Rect(1, 1, 2, 2)).(*
 var rayWidth, moveSpeed, rotationSpeed float64
 var worldX, worldY int
 
-var rayCollection []ray
+
 var dist = 0.0
 var inc bool = false
 var step = 0.1
@@ -40,7 +40,7 @@ func init() {
 	worldX = 640
 	worldY = 640
 
-	rayWidth = 20
+	rayWidth = 10
 	moveSpeed = .5
 	rotationSpeed = 5
 
@@ -65,7 +65,6 @@ func init() {
 		moveSpeed,
 		rotationSpeed)
 
-	rayCollection = make([]ray, worldX/int(rayWidth))
 	World.rayCaster.UpdateRays()
 
 }

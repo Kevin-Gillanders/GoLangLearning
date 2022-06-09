@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -11,10 +10,8 @@ type rayCaster struct {
 	rayCollection []ray
 }
 
-func NewRayCaster(screenX int, screenY int, rayWidth float64) rayCaster {
-	fmt.Printf("worldX %v  worldY %v\n", screenX, screenY)
-	fmt.Printf("screenX/int(rayWidth) %v  screenY/int(rayWidth) %v\n", screenX/int(rayWidth), screenY/int(rayWidth))
-	rayCollection := make([]ray, screenX/int(rayWidth), screenX/int(rayWidth))
+func NewRayCaster(fov int, rayWidth float64) rayCaster {
+	rayCollection := make([]ray, fov/int(rayWidth) + 1)
 	return rayCaster{
 		rayCollection: rayCollection,
 	}
