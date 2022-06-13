@@ -2,9 +2,11 @@ package main
 
 import (
 	"image/color"
+	"math"
 )
 
 type camera struct {
+	worldUnitPosX, worldUnitPosY int
 	worldPosX, worldPosY float64
 	unitSize, mapSize    int
 	angle                float64
@@ -14,9 +16,10 @@ type camera struct {
 	transparent bool
 	colour      color.Color
 }
-
 func NewCamera(x float64, y float64) camera {
 	return camera{
+		worldUnitPosX:   int(math.Floor(x)),
+		worldUnitPosY:   int(math.Floor(y)),
 		worldPosX:   x,
 		worldPosY:   y,
 		angle:       0,

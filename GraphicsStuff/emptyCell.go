@@ -43,6 +43,6 @@ func (emptyCell emptyCell) LineOfSightIntersect(float64, float64) bool {
 	panic("emp LineOfSightIntersect Not implemented")
 }
 
-func (emptyCell emptyCell) GetSize() int{
+func (emptyCell emptyCell) GetSize() int {
 	return emptyCell.unitSize
 }

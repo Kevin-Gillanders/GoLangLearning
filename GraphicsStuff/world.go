@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
+	"log"
 	"reflect"
 
 	// "image/color"
@@ -28,7 +28,7 @@ type world struct {
 }
 
 func CreateWorld(worldDefinition [][]rune, rayWidth float64, screenX int, screenY int, moveSpeed float64, rotationSpeed float64) world {
-	fmt.Println("Creating world")
+	log.Println("Creating world")
 
 	lineX = 20
 	lineY = 1
@@ -75,7 +75,7 @@ func (world world) UpdateCameraPosition(keys []ebiten.Key) world {
 
 	currentX, currentY, currentTheta := world.camera.GetCameraVector()
 	var distance, newTheta float64
-	
+
 	newX := currentX
 	newY := currentY
 	newTheta = currentTheta
@@ -93,91 +93,87 @@ func (world world) UpdateCameraPosition(keys []ebiten.Key) world {
 		// W : Y - MS
 		// S : Y + MS
 		switch k {
-			//Grid controls
-			case ebiten.KeyA:
-				newX = currentX - moveSpeed
-				newY = currentY
-			
-			case ebiten.KeyW:
-				newX = currentX 
-				newY = currentY - moveSpeed
-			
-			case ebiten.KeyS:
-				newX = currentX 
-				newY = currentY + moveSpeed
-			
-			case ebiten.KeyD:
-				newX = currentX + moveSpeed
-				newY = currentY 
-			
-			case ebiten.KeyQ:
-				newTheta = (currentTheta - world.rotationSpeed)
-				fmt.Printf("Left <= currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
-				if newTheta < 0 {
-					newTheta = newTheta + 360
-				}
-				newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
+		//Grid controls
+		case ebiten.KeyA:
+			newX = currentX - moveSpeed
+			newY = currentY
 
-			case ebiten.KeyE:
-				newTheta = math.Mod(currentTheta+world.rotationSpeed, 360)
-				fmt.Printf("Right => currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
-				newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
-			
+		case ebiten.KeyW:
+			newX = currentX
+			newY = currentY - moveSpeed
 
+		case ebiten.KeyS:
+			newX = currentX
+			newY = currentY + moveSpeed
 
+		case ebiten.KeyD:
+			newX = currentX + moveSpeed
+			newY = currentY
 
-			//Tank controls
-			case ebiten.KeyArrowLeft:
-				newTheta = (currentTheta - world.rotationSpeed)
-				fmt.Printf("Left <= currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
-				if newTheta < 0 {
-					newTheta = newTheta + 360
-				}
-				newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
+		case ebiten.KeyQ:
+			newTheta = (currentTheta - world.rotationSpeed)
+			log.Printf("Left <= currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
+			if newTheta < 0 {
+				newTheta = newTheta + 360
+			}
+			newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
 
-			case ebiten.KeyArrowUp:
-				distance = distance + world.movementSpeed
-				newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
-				
-			case ebiten.KeyArrowDown:
-				distance = distance - world.movementSpeed
-				newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
-			
-			case ebiten.KeyArrowRight:
-				newTheta = math.Mod(currentTheta+world.rotationSpeed, 360)
-				fmt.Printf("Right => currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
-				newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
-			
-			case ebiten.KeyR:
-				world.camera.UpdatePosition(1, 1, 0)
-				return world
-			
-			case ebiten.KeySpace:
-				newTheta = math.Mod(currentTheta+90, 360)
-			
-			case ebiten.KeyL:
-				newTheta = math.Mod(currentTheta+45, 360)
-			
-			case ebiten.KeyZ:
-				lineX ++
+		case ebiten.KeyE:
+			newTheta = math.Mod(currentTheta+world.rotationSpeed, 360)
+			log.Printf("Right => currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
+			newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
+
+		//Tank controls
+		case ebiten.KeyArrowLeft:
+			newTheta = (currentTheta - world.rotationSpeed)
+			log.Printf("Left <= currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
+			if newTheta < 0 {
+				newTheta = newTheta + 360
+			}
+			newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
+
+		case ebiten.KeyArrowUp:
+			distance = distance + world.movementSpeed
+			newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
+
+		case ebiten.KeyArrowDown:
+			distance = distance - world.movementSpeed
+			newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
+
+		case ebiten.KeyArrowRight:
+			newTheta = math.Mod(currentTheta+world.rotationSpeed, 360)
+			log.Printf("Right => currentTheta : %v NewTheta %v\n", currentTheta, newTheta)
+			newX, newY = DerivedNewPoint(currentX, currentY, distance, newTheta)
+
+		case ebiten.KeyR:
+			world.camera.UpdatePosition(20, 20, 0)
+			return world
+
+		case ebiten.KeySpace:
+			newTheta = math.Mod(currentTheta+90, 360)
+
+		case ebiten.KeyL:
+			newTheta = math.Mod(currentTheta+45, 360)
+
+		case ebiten.KeyZ:
+			lineX++
+			line = ebiten.NewImage(lineX, lineY)
+			line.Fill(color.White)
+
+		case ebiten.KeyX:
+			if lineX > 1 {
+				lineX--
 				line = ebiten.NewImage(lineX, lineY)
 				line.Fill(color.White)
-			
-			case ebiten.KeyX:
-				if lineX > 1 {
-					lineX --
-					line = ebiten.NewImage(lineX, lineY)
-					line.Fill(color.White)
-				}
+			}
 		}
 	}
-
 	world.camera.UpdatePosition(newX, newY, newTheta)
 
-	fmt.Println("================")
-	fmt.Printf("currentX %v currentY %v angle %v distance %v\n", currentX, currentY, currentTheta, distance)
-	fmt.Printf("newX %v newY %v newangle %v \n", newX, newY, newTheta)
-	fmt.Println("================")
+	log.Println("================")
+	log.Printf("currentX %v currentY %v angle %v distance %v\n", currentX, currentY, currentTheta, distance)
+	log.Printf("newX %v newY %v newangle %v \n", newX, newY, newTheta)
+	log.Println("================")
 
 	// if clockwise{
 	// 	world.camera.Rotate(world.rotationSpeed)
@@ -195,18 +191,16 @@ func (world world) Draw2DWorld(screen *ebiten.Image) {
 	squareY := worldY / len(world.entities)
 
 	if square == nil {
-		square = ebiten.NewImage(squareX - 1, squareY - 1)
+		square = ebiten.NewImage(squareX-1, squareY-1)
 		square.Fill(color.White)
 	}
 
 	for iY, y := range world.entities {
 		for iX, x := range y {
-			// Fill the screen with #FF0000 color
-			// Fill the square with the white color
 			// fmt.Println(reflect.TypeOf(x))
 			// fmt.Println(float64(iX) * float64(x.GetSize()), float64(iY) * float64(x.GetSize()))
 			op := &ebiten.DrawImageOptions{}
-			op.GeoM.Translate(float64(iX) * float64(x.GetSize()), float64(iY) * float64(x.GetSize()))	
+			op.GeoM.Translate(float64(iX)*float64(x.GetSize()), float64(iY)*float64(x.GetSize()))
 			op.ColorM.ScaleWithColor(x.GetColour())
 			// Create an empty option struct
 			// fmt.Println(len(world.entities), len(world.entities))
@@ -217,15 +211,12 @@ func (world world) Draw2DWorld(screen *ebiten.Image) {
 	}
 
 	world.DrawCamera(screen)
-	
-
 
 }
 
+func (world world) DrawCamera(screen *ebiten.Image) {
 
-func (world world) DrawCamera(screen *ebiten.Image){
-
-	if cameraImage == nil || line == nil{
+	if cameraImage == nil || line == nil {
 		line = ebiten.NewImage(lineX, lineY)
 		line.Fill(color.White)
 		cameraImage = ebiten.NewImage(world.camera.mapSize, world.camera.mapSize)

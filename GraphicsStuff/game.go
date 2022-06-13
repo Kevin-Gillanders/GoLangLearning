@@ -5,7 +5,6 @@ import (
 	"image"
 	"image/color"
 	"log"
-	"strings"
 	"time"
 
 	// "math/rand"
@@ -21,7 +20,6 @@ var emptySubImage *ebiten.Image = emptyImage.SubImage(image.Rect(1, 1, 2, 2)).(*
 var rayWidth, moveSpeed, rotationSpeed float64
 var worldX, worldY int
 
-
 var dist = 0.0
 var inc bool = false
 var step = 0.1
@@ -35,26 +33,28 @@ type Game struct {
 }
 
 func init() {
+	log.SetFlags(log.Lshortfile)
 	emptyImage.Fill(color.White)
 
 	worldX = 640
 	worldY = 640
 
 	rayWidth = 10
-	moveSpeed = .5
+	moveSpeed = 5
 	rotationSpeed = 5
 
 	worldOutline := [][]rune{
 		{'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X'},
-		{'X', '>', '-', '-', '-', '-', '>', '-', '-', 'X'},
+		{'X', '>', '-', '-', '-', '-', '-', '-', '-', 'X'},
 		{'X', '-', 'X', '-', '-', '-', '-', 'X', '-', 'X'},
 		{'X', '-', '-', '-', '-', '-', '-', '-', '-', 'X'},
 		{'X', 'X', 'X', 'X', '-', '-', 'X', 'X', 'X', '-'},
 		{'X', 'X', 'X', 'X', '-', '-', 'X', 'X', 'X', 'X'},
-		{'X', '>', '-', '-', '-', '-', '>', '-', '-', 'X'},
+		{'X', '-', '-', '-', '-', '-', '-', '-', '-', 'X'},
 		{'X', '-', 'X', '-', '-', '-', '-', 'X', '-', 'X'},
 		{'X', '-', '-', '-', '-', '-', '-', '-', '-', 'X'},
 		{'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', '-'},
+
 	}
 
 	World = CreateWorld(
@@ -65,7 +65,7 @@ func init() {
 		moveSpeed,
 		rotationSpeed)
 
-	World.rayCaster.UpdateRays()
+	// World.rayCaster.UpdateRays()
 
 }
 
@@ -79,7 +79,7 @@ func (g *Game) Update() error {
 	World = World.UpdateCameraPosition(g.keys)
 	// 	t = time.Now().Add(time.Second)
 	// }
-	World.rayCaster.UpdateRays()
+	World.rayCaster.UpdateRays(World.camera.worldPosX, World.camera.worldPosY, World.camera.angle)
 
 	dist = UpdateDist(dist, step)
 
@@ -110,17 +110,18 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	// World.rayCaster.DrawRays(screen)
 	// World.DrawGrid(screen)
-	if len(g.keys) == 0 {
-		ebitenutil.DebugPrint(screen, fps)
+	// if len(g.keys) == 0 {
+	x, y := World.camera.GetCoord()
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("%v\nWorldx : %v Worldy : %v", fps, x, y))
 
-	} else {
-		keyStrs := []string{}
-		for _, p := range g.keys {
-			keyStrs = append(keyStrs, p.String())
-		}
-		ebitenutil.DebugPrint(screen, strings.Join(keyStrs, ", "))
+	// } else {
+	// 	keyStrs := []string{}
+	// 	for _, p := range g.keys {
+	// 		keyStrs = append(keyStrs, p.String())
+	// 	}
+	// 	ebitenutil.DebugPrint(screen, strings.Join(keyStrs, ", "))
 
-	}
+	// }
 
 }
 

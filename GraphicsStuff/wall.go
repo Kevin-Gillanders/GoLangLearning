@@ -4,7 +4,7 @@ import "image/color"
 
 type wall struct {
 	worldX, worldY float64
-	unitSize       int 
+	unitSize       int
 	traversable    bool
 	transparent    bool
 	colour         color.Color
@@ -43,6 +43,6 @@ func (wall wall) LineOfSightIntersect(float64, float64) bool {
 	panic("wall los Not implemented")
 }
 
-func (wall wall) GetSize() int{
+func (wall wall) GetSize() int {
 	return wall.unitSize
 }
