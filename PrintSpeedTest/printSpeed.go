@@ -3,12 +3,15 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 	"syscall"
 	"time"
-    "os/exec"
+
+	"github.com/eiannone/keyboard"
 )
 
 func fmtPrint(iter int) {
@@ -132,7 +135,11 @@ func GenScreenContent(char rune, x, y int) [][] rune{
 	for a := 0; a < y; a++{
 		row := [] rune{}
 		for b := 0; b < x-1; b++{
-			row = append(row, char)
+			if a == 0{
+				row = append(row, '=')
+			} else{
+				row = append(row, char)
+			}
 		}
 		row = append(row, '|')
 
@@ -141,12 +148,27 @@ func GenScreenContent(char rune, x, y int) [][] rune{
 	return content
 }
 
-func GenScreenContentString(char string, x, y int) [] string{
+func GenScreenContentString(char string, x, y int, wallHeight float64) [] string{
 	content := [] string{}
+	wallStart := (float64(y) / 2) - (wallHeight / 2)
+	wallend   := (float64(y) / 2) + (wallHeight / 2)
 	for a := 0; a < y; a++{
 		var sb strings.Builder
 		for b := 0; b < x-1; b++{
-			sb.WriteString(char)
+			if a == 0{
+				sb.WriteString("=")
+			} else if a == y -1{
+				sb.WriteString("=")
+			} else {
+				if float64(a) < wallStart{
+					sb.WriteString(" ")
+				} else if float64(a) < wallend{
+					sb.WriteString(char)
+				}else{
+					sb.WriteString(" ")
+				}
+
+			}
 		}
 		sb.WriteString("|")
 		content = append(content, sb.String())
@@ -227,13 +249,13 @@ func main() {
 	ScreenTest()
 	t1 = time.Now()
 
-	content := GenScreenContent('X', 211, 49)
+	content := GenScreenContent('X', 211, 50)
 	contentGenTime := fmt.Sprintf("=======contentGen took %v========\n", time.Now().Sub(t1))
 
 	fmt.Println("======================================")
 	t1 = time.Now()
 
-	strContent := GenScreenContentString("@", 211, 49)
+	strContent := GenScreenContentString("@", 211, 50, 50)
 	strContentGenTime := fmt.Sprintf("=======strContentGen took %v========\n", time.Now().Sub(t1))
 
 	fmt.Println("======================================")
@@ -273,34 +295,34 @@ func main() {
 
 
 	ClearScreen()
-
+	//Remove cursor
+	fmt.Print("\033[?25l")
 	t1 = time.Now()
 	counter := 0
 	chr := "@"
 	for {
-		// fmt.Print("\033[2J")
 		fmt.Printf("\033[%d;%dH", 0, 0)
 		counter++
 
-		if counter % 200 > 100{
-			chr = "@"
-		} else {
-			chr = "#"
-		}
-		bufPrintContentString(GenScreenContentString(chr, 211, 49))
+		// if counter % 200 > 100{
+		// 	chr = "@"
+		// } else {
+		// 	chr = "#"
+		// }
+		bufPrintContentString(GenScreenContentString(chr, 211, 50, float64(counter % 50)))
 
 		if time.Now().After(t1.Add(time.Second*10)){
 			break
 		}
+		time.Sleep(time.Millisecond * 100)
 	}
 
 	fmt.Println("======================================")
 	fmt.Println("frames drawn ", counter)
 	fmt.Println("This gives an FPS of ", counter/10)
 	fmt.Println("======================================")
-
- 
-
+	//Re show cursor
+	fmt.Print("\033[?25h")
 }
 
 func ClearScreen() {
@@ -324,8 +346,20 @@ func ScreenTest() {
 	// power shell terminal
 	// X 39
 	// cmd
-	// X 48
+	// X 50
 	for y:= 0; y < 200; y++{
 		fmt.Println(y)
 	}
+
+}
+
+
+func CheckInput(keyPress chan <- rune){
+	_, err := keyboard.GetKeys(10)
+	if err != nil{
+		log.Println(err)
+	}	
+
+
+
 }
