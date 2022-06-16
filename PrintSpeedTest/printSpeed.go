@@ -149,6 +149,8 @@ func GenScreenContent(char rune, x, y int) [][] rune{
 }
 
 func GenScreenContentString(char string, x, y int, wallHeight float64) [] string{
+	//This should be broken up to cast ray col by col not cell by cell
+	//https://stackoverflow.com/questions/40118945/trying-to-print-transpose-string
 	content := [] string{}
 	wallStart := (float64(y) / 2) - (wallHeight / 2)
 	wallend   := (float64(y) / 2) + (wallHeight / 2)
@@ -355,6 +357,7 @@ func ScreenTest() {
 
 
 func CheckInput(keyPress chan <- rune){
+	//TODO look at how this should be implemented
 	_, err := keyboard.GetKeys(10)
 	if err != nil{
 		log.Println(err)
