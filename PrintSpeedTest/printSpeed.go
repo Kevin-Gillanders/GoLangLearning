@@ -297,13 +297,21 @@ func main() {
 
 
 	ClearScreen()
+
+	start := fmt.Sprintf("\033[%d;%dH", 0, 0)
+	buf := bufio.NewWriter(os.Stdout)
+	// fmt.Fprint(buf, "Hello world")
+	// fmt.Fprint(buf, start)
+
 	//Remove cursor
 	fmt.Print("\033[?25l")
 	t1 = time.Now()
 	counter := 0
 	chr := "@"
 	for {
-		fmt.Printf("\033[%d;%dH", 0, 0)
+		// fmt.Printf(start)
+		fmt.Fprint(buf, start)
+
 		counter++
 
 		// if counter % 200 > 100{
@@ -311,12 +319,13 @@ func main() {
 		// } else {
 		// 	chr = "#"
 		// }
-		bufPrintContentString(GenScreenContentString(chr, 211, 50, float64(counter % 50)))
+		bufPrintContentString(GenScreenContentString(chr, 211, 49, float64(counter % 50)))
 
 		if time.Now().After(t1.Add(time.Second*10)){
 			break
 		}
-		time.Sleep(time.Millisecond * 100)
+		buf.Flush()
+		// time.Sleep(time.Millisecond * 100)
 	}
 
 	fmt.Println("======================================")
@@ -325,6 +334,13 @@ func main() {
 	fmt.Println("======================================")
 	//Re show cursor
 	fmt.Print("\033[?25h")
+
+
+
+	fmt.Fprint(buf, "goodbye world")
+
+	buf.Flush()
+	fmt.Scanln()
 }
 
 func ClearScreen() {
